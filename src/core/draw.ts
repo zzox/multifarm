@@ -43,10 +43,15 @@ export const clear = (bgColor:string = 'black') => {
   context.fillRect(0, 0, Width, Height)
 }
 
+export const drawUiBg = () => {
+  context.fillStyle = '#040403'
+  context.fillRect(0, Height, Width, 16)
+}
+
 export const drawBarBg = () => {
   context.drawImage(image,
     0, 48, 48, 16,
-    0, Height - 16, 48, 16
+    0, Height, 48, 16
   )
 }
 
@@ -61,5 +66,5 @@ export const drawBar = (percent:number) => {
     context.fillStyle = '#1a7a3e'
   }
 
-  context.fillRect(3, Height - 12, Math.round(42 * Math.min(percent, 1.0)), 8)
+  context.fillRect(3, Height + 4, Math.round(42 * Math.min(percent, 1.0)), 8)
 }

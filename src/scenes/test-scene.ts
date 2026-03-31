@@ -1,5 +1,5 @@
 import { Height, hiTarget, loTarget, maxPercent, NumTilesHeight, NumTilesWidth, TileHeight, TileWidth, Width } from '../core/const'
-import { drawSprite, drawTile, drawDebug, getContext, drawBarBg, drawBar } from '../core/draw'
+import { drawSprite, drawTile, drawDebug, getContext, drawBarBg, drawBar, drawUiBg } from '../core/draw'
 import { justPressed, keys } from '../core/keys'
 import { Debug } from '../util/debug'
 import { forEachGI, getGridItem, makeGrid, setGridItem } from '../world/grid'
@@ -198,15 +198,17 @@ export class Scene {
   }
 
   drawUi () {
+    drawUiBg()
+
     if (this.inventory) {
-      drawSprite(Width - 16 - 4, Height - 16, 59)
-      drawSprite(Width - 16 - 4, Height - 16, this.inventory)
+      drawSprite(Width - 16 - 4, Height, 59)
+      drawSprite(Width - 16 - 4, Height, this.inventory)
     } else if (this.guy.state === T$.PreThrow) {
       const item = this.guy.holding!.type
-      drawSprite(Width - 16 - 4, Height - 16, 59 + this.guy.facing + 1)
-      drawSprite(Width - 16 - 4, Height - 16, item)
+      drawSprite(Width - 16 - 4, Height, 59 + this.guy.facing + 1)
+      drawSprite(Width - 16 - 4, Height, item)
     } else {
-      drawSprite(Width - 16 - 4, Height - 16, 59)
+      drawSprite(Width - 16 - 4, Height, 59)
     }
 
     let percent = 0
@@ -222,7 +224,7 @@ export class Scene {
 
     // drawBarTop() vvv
     getContext().globalAlpha = 0.8
-    drawSprite(32, Height - 16, 51)
+    drawSprite(32, Height, 51)
     getContext().globalAlpha = 1.0
   }
 

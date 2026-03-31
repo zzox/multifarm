@@ -1,10 +1,10 @@
 // size of game in pixels
 export const Width = 240
-export const Height = 160
+export const Height = 144
 
 // size of tiles
-export const TileWidth = 12
-export const TileHeight = 8
+export const TileWidth = 16
+export const TileHeight = 12
 
 // size of game in tiles
 export const NumTilesWidth = Width / TileWidth
