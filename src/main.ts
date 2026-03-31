@@ -9,6 +9,9 @@ const fixed = document.getElementsByClassName('fixed')[0] as HTMLDivElement
 let scene:Scene
 let debugScale = 0
 
+let mouseX = 0
+let mouseY = 0
+
 let paused:boolean = false
 
 const update = () => {
@@ -56,10 +59,12 @@ const draw = () => {
 
   if (Debug.on) {
     const pItems = Array.from(fixed.querySelectorAll('p'))
+
     pItems[0].textContent = `FPS: ${Debug.renderFrames.length}, avg: ${Math.round(average(Debug.renderTimes) * 1000)}us`
     pItems[1].textContent = `UPS: ${Debug.updateFrames.length}, avg: ${Math.round(average(Debug.updateTimes) * 1000)}us`
     pItems[2].textContent = `things: ${scene.things.length} checks: ${scene.checks}`
     pItems[3].textContent = `scale: ${debugScale}`
+    pItems[4].textContent = `mouse ${Math.floor(mouseX)},${Math.floor(mouseY)}`
     fixed.classList.remove('none')
   } else {
     fixed.classList.add('none')
@@ -164,6 +169,12 @@ const run = async () => {
   document.onkeyup = (event:KeyboardEvent) => {
     // event.preventDefault()
     keys.set(event.key, false)
+  }
+
+  window.onmousemove = (ev:MouseEvent) => {
+    const rect = canvas.getBoundingClientRect()
+    mouseX = (ev.clientX - rect.x) / debugScale / window.devicePixelRatio
+    mouseY = (ev.clientY - rect.y) / debugScale / window.devicePixelRatio
   }
 
   Debug.renderTimes = [...new Array(300)].map(_ => 0) // 5 seconds on 60fps monitors
