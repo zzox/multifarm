@@ -5,7 +5,7 @@ import { Debug } from '../util/debug'
 import { forEachGI, getGridItem, makeGrid, setGridItem } from '../world/grid'
 import { allCollides, checkDirectionalCollision, collideWallProj, collideWallXY, overlaps, thingsOverlap, updatePhysics } from '../world/physics'
 import { Grid } from '../world/grid'
-import { clone3, Collides, collides, FacingDir, sq, Square, vec2, vec3 } from '../types'
+import { clone3, Collides, collides, FacingDir, sq, Square, Vec2, vec2, vec3 } from '../types'
 import { Actor, bottomY, centerX, newActor, newThing, Thing, ThingType, facingAngle, throwPos, ThingState as T$, setState, holdPos, hurtActor, pickupPos, pickupTypes, ThingState, dropPos } from '../data/actor-data'
 import { getActorAnim, getAnim } from '../data/anim-data'
 import { randomInt } from '../util/random'
@@ -192,6 +192,9 @@ export class Scene {
       if (this.debugSquare) {
         drawDebug(this.debugSquare.x, this.debugSquare.y, this.debugSquare.w, this.debugSquare.h, '#00ff00')
       }
+
+      const lead = this.getLeadSquare()
+      drawDebug(lead.x * TileWidth, lead.y * TileHeight, TileWidth, TileHeight)
     }
 
     this.drawUi()
@@ -656,5 +659,26 @@ export class Scene {
 
   removeFacingDir (dir:FacingDir) {
     this.facingDirs = this.facingDirs.filter(d => d !== dir)
+  }
+
+  getLeadSquare ():Vec2 {
+    let x:number = 0
+    let y:number = 0
+
+    if (this.guy.facing === FacingDir.Left) {
+      x = this.guy.pos.x - 12
+      y = this.guy.pos.y + this.guy.size.y / 2
+    } else if (this.guy.facing === FacingDir.Right) {
+      x = this.guy.pos.x + this.guy.size.x + 12
+      y = this.guy.pos.y + this.guy.size.y / 2
+    } else if (this.guy.facing === FacingDir.Up) {
+      x = this.guy.pos.x + this.guy.size.x / 2
+      y = this.guy.pos.y - 8
+    } else if (this.guy.facing === FacingDir.Down) {
+      x = this.guy.pos.x + this.guy.size.x / 2
+      y = this.guy.pos.y + this.guy.size.y + 8
+    }
+
+    return vec2(Math.floor(x / TileWidth), Math.floor(y / TileHeight))
   }
 }
