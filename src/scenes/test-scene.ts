@@ -9,6 +9,7 @@ import { clone3, Collides, collides, FacingDir, sq, Square, Vec2, vec2, vec3 } f
 import { Actor, bottomY, centerX, newActor, newThing, Thing, ThingType, facingAngle, throwPos, ThingState as T$, setState, holdPos, hurtActor, pickupPos, pickupTypes, ThingState, dropPos } from '../data/actor-data'
 import { getActorAnim, getAnim } from '../data/anim-data'
 import { randomInt } from '../util/random'
+import { Connection } from '../net/connection'
 
 const guyRunVel = 60
 // const diagVel = vel / Math.SQRT2
@@ -56,7 +57,8 @@ export class Scene {
   doors:Collides
 
   // player state
-  guy:Actor
+  guys:Actor[] = []
+  guyIndex:number
   inventory?:ThingType
   jumpBuffer:number = JumpFrames + 1
   throwTime:number = 0
@@ -72,9 +74,9 @@ export class Scene {
   checks:number = 0
 
   constructor () {
-    this.guy = newActor(ThingType.Guy, vec3(100, 80, 0))
+    this.guys.push(newActor(ThingType.Guy, vec3(100, 80, 0)))
 
-    this.things.push(this.guy)
+    this.things.push(this.guys[0])
 
     this.doors = {
       left: true,
@@ -83,10 +85,20 @@ export class Scene {
       up: true
     }
     this.makeWalls()
+
+    this.guyIndex = 0
   }
 
   create () {
     console.log('we here')
+    Connection.init()
+    setTimeout(() => {
+      Connection.inst.joinOrCreateRoom()
+    }, 1000)
+  }
+
+  get guy () {
+    return this.guys[this.guyIndex]
   }
 
   update () {

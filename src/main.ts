@@ -3,6 +3,7 @@ import { Scene } from './scenes/test-scene'
 import { Debug } from './util/debug'
 import { average } from './util/utils'
 import { clear, setContext, setImage } from './core/draw'
+import { LogLevel, setLogLevel } from './util/logger'
 
 const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
 const fixed = document.getElementsByClassName('fixed')[0] as HTMLDivElement
@@ -13,6 +14,8 @@ let mouseX = 0
 let mouseY = 0
 
 let paused:boolean = false
+
+setLogLevel(LogLevel.Debug)
 
 const update = () => {
   const updateStart = performance.now()
