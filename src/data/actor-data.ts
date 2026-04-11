@@ -61,6 +61,9 @@ export type Actor = Thing & {
   facing:FacingDir
   hurtFrames:number
   holding?:Thing
+  throwTime:number
+  throwRecovery:number
+  inventory?:ThingType
 }
 
 const defaultThing:Thing = {
@@ -107,7 +110,10 @@ const defaultActor:Actor = {
   ...defaultThing,
   isActor: true,
   facing: FacingDir.Down,
-  hurtFrames: 0
+  hurtFrames: 0,
+  // inventory?:ThingType
+  throwTime: 0,
+  throwRecovery: 0
 }
 
 const actorData: { [index:number]: Actor } = {

@@ -45,6 +45,11 @@ type FloorParticle = {
   frames:number
 }
 
+type State = {
+  // player state
+  guys:Actor[]
+}
+
 export class Scene {
   worldx:number = 0
   worldy:number = 0
@@ -56,13 +61,14 @@ export class Scene {
   doorsOpen:boolean = false
   doors:Collides
 
-  // player state
-  guys:Actor[] = []
   guyIndex:number
-  inventory?:ThingType
+  // player state
+
+  state:State = {
+    guys: []
+  }
+
   jumpBuffer:number = JumpFrames + 1
-  throwTime:number = 0
-  throwRecovery:number = 0
   facingDirs:FacingDir[] = []
 
   // TEMP:
@@ -74,9 +80,9 @@ export class Scene {
   checks:number = 0
 
   constructor () {
-    this.guys.push(newActor(ThingType.Guy, vec3(100, 80, 0)))
+    this.state.guys.push(newActor(ThingType.Guy, vec3(100, 80, 0)))
+    this.things.push(this.state.guys[0])
 
-    this.things.push(this.guys[0])
 
     this.doors = {
       left: true,
@@ -98,7 +104,7 @@ export class Scene {
   }
 
   get guy () {
-    return this.guys[this.guyIndex]
+    return this.state.guys[this.guyIndex]
   }
 
   update () {
@@ -215,9 +221,9 @@ export class Scene {
   drawUi () {
     drawUiBg()
 
-    if (this.inventory) {
+    if (this.guy.inventory) {
       drawSprite(Width - 16 - 4, Height, 59)
-      drawSprite(Width - 16 - 4, Height, this.inventory)
+      drawSprite(Width - 16 - 4, Height, this.guy.inventory)
     } else if (this.guy.state === T$.PreThrow) {
       const item = this.guy.holding!.type
       drawSprite(Width - 16 - 4, Height, 59 + this.guy.facing + 1)
@@ -231,7 +237,7 @@ export class Scene {
       percent = this.guy.stateTime / 60
     } else if (this.guy.state === T$.Throw) {
       // save throw vel
-      percent = this.throwTime / 60
+      percent = this.guy.throwTime / 60
     }
 
     drawBarBg()
@@ -302,7 +308,7 @@ export class Scene {
     }
 
     if (this.guy.state === T$.None && justPressed.get('c')/* && keys.get('v') */) {
-      if (!this.inventory) {
+      if (!this.guy.inventory) {
         if (this.guy.pos.z === 0) {
           this.guyPickUp()
         } else {
@@ -314,7 +320,7 @@ export class Scene {
       }
     }
 
-    if (this.guy.state === T$.Throw && this.guy.stateTime > this.throwRecovery) {
+    if (this.guy.state === T$.Throw && this.guy.stateTime > this.guy.throwRecovery) {
       setState(this.guy, T$.None)
     }
 
@@ -509,7 +515,7 @@ export class Scene {
   }
 
   guyStartThrow () {
-    if (!this.inventory) {
+    if (!this.guy.inventory) {
       console.warn('cant throw nothing')
       return
     }
@@ -518,10 +524,10 @@ export class Scene {
     const pos = holdPos(this.guy)
     const angle = facingAngle(this.guy.facing)
 
-    const thing = newThing(this.inventory, pos, angle, true)
+    const thing = newThing(this.guy.inventory, pos, angle, true)
     this.guy.holding = thing
     this.things.push(thing)
-    this.inventory = undefined
+    this.guy.inventory = undefined
   }
 
   guyThrow () {
@@ -533,15 +539,15 @@ export class Scene {
       throw new Error('No thing to throw')
     }
 
-    this.throwTime = this.guy.stateTime
-    const percent = this.throwTime / 60
+    this.guy.throwTime = this.guy.stateTime
+    const percent = this.guy.throwTime / 60
     let vel = 120
-    this.throwRecovery = 30
+    this.guy.throwRecovery = 30
     if (percent > maxPercent) {
-      this.throwRecovery = 60
+      this.guy.throwRecovery = 60
       vel *= 0.8
     } else if (percent > hiTarget) {
-      this.throwRecovery = 45
+      this.guy.throwRecovery = 45
       vel *= 1.1
     // } else if (percent > loTarget) {
     //   this.throwRecovery = 30
@@ -571,7 +577,7 @@ export class Scene {
     const pos = pickupPos(this.guy)
     this.debugSquare = sq(pos.x, pos.y, 16, 16)
 
-    if (this.inventory) {
+    if (this.guy.inventory) {
       throw new Error('cant pick up')
     }
 
@@ -582,22 +588,22 @@ export class Scene {
     if (things.length) {
       const thing = things[0]
       thing.dead = true
-      this.inventory = thing.type
+      this.guy.inventory = thing.type
     }
   }
 
   guyDrop () {
     const pos = dropPos(this.guy)
 
-    if (!this.inventory) {
+    if (!this.guy.inventory) {
       throw new Error('cant pick up')
     }
 
-    const thing = newThing(this.inventory, vec3(pos.x, pos.y, 3))
+    const thing = newThing(this.guy.inventory, vec3(pos.x, pos.y, 3))
     this.things.push(thing)
     thing.pos.x -= thing.size.x / 2
     thing.pos.y -= thing.size.y / 2
-    this.inventory = undefined
+    this.guy.inventory = undefined
   }
 
   openDoors () {
